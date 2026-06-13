@@ -404,7 +404,7 @@
   <button class="tab-btn active" onclick="showTab('vocab')">📚 Vocabulary</button>
   <button class="tab-btn" onclick="showTab('expressions')">💬 Expressions</button>
   <button class="tab-btn" onclick="showTab('dialogues')">🗣 Dialogues</button>
-  <button class="tab-btn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd7_2DLer88abNMZ_Hq0O6lENwH4zhOfFrmj9cK7Z3HRcyVmA/viewform','_blank')">✏️ Quiz</button>
+  <button class="tab-btn" onclick="window.open('https://wayground.com/admin/quiz/6a2bf514c42f8d4788602f75','_blank')">✏️ Quiz</button>
   <button class="tab-btn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSfSP2uqC9D-M_9UxHhBl3Ei5mRGTv4FDdQf2bLb1c6iSbCknw/viewform','_blank')">🎯 Practice</button>
 </nav>
 
@@ -687,148 +687,7 @@ function flip(card) {
   card.classList.toggle('flipped');
 }
 
-// Quiz data
-const quizData = [
-  {
-    q: "Your friend just cancelled plans for the 2nd time this week. How do you react?",
-    context: "A: Maaf ya, aku nggak bisa dateng lagi hari ini.",
-    options: ["Syukurlah! Aku juga sibuk.", "Kok gitu sih?! Kecewa banget aku.", "Nggak sabar banget!", "Gokil banget!"],
-    correct: 1,
-    explain: "Kok gitu sih? = How could you do that? + Kecewa banget = So disappointed. Perfect for this frustrating situation."
-  },
-  {
-    q: "Your friend texts: 'Kita jadi nonton?' — What is she asking?",
-    options: ["Are we going to become movie watchers?", "Are we still going to watch (as planned)?", "Do we want to watch something?", "Did we already watch?"],
-    correct: 1,
-    explain: "'Jadi' here checks if the plan is still happening — 'Are we still watching (as planned)?'"
-  },
-  {
-    q: "You're lying in bed on a Sunday and your friend wants you to go out. Which reply fits?",
-    context: "A: Jalan yuk! Mau ke mana?",
-    options: ["Seru banget! Gas!", "Duh, mager pol. Nanti aja lah.", "Sumpah?! Ke mana?", "Nggak nyangka!"],
-    correct: 1,
-    explain: "Mager pol = extremely lazy, nanti aja lah = later/maybe later. Classic lazy Sunday response!"
-  },
-  {
-    q: "Your friend shares unexpected good news: she got a job offer in Paris. What do you say first?",
-    context: "A: Aku dapat tawaran kerja di Paris!",
-    options: ["Kasihan banget!", "Nggak mood.", "Serius?! Gokil banget!", "Kok gitu sih?"],
-    correct: 2,
-    explain: "Serius?! = Seriously?! (surprise) + Gokil banget! = That's amazing! The natural first reaction to great news."
-  },
-  {
-    q: "You want to change the topic in conversation to ask about your friend's sister. What do you say?",
-    options: ["Gara-gara adik kamu...", "Ngomong-ngomong, gimana kabar adik kamu?", "Beneran adik kamu...?", "Jadi adik kamu..."],
-    correct: 1,
-    explain: "Ngomong-ngomong = 'by the way' — perfect for smoothly changing topics."
-  },
-  {
-    q: "It rained heavily so you and your friend couldn't go to the beach. How do you explain?",
-    options: ["Mungkin kita nggak ke pantai.", "Woles aja, kita ke pantai.", "Gara-gara hujan deras, kita batal ke pantai.", "Iseng aja ke pantai."],
-    correct: 2,
-    explain: "Gara-gara = because of. 'Because of the heavy rain, we cancelled going to the beach.'"
-  }
-];
 
-let answered = [];
-let score = 0;
-
-function buildQuiz() {
-  answered = new Array(quizData.length).fill(false);
-  score = 0;
-  const container = document.getElementById('quiz-container');
-  container.innerHTML = '';
-  document.getElementById('quiz-score').classList.remove('show');
-
-  quizData.forEach((q, qi) => {
-    const div = document.createElement('div');
-    div.className = 'quiz-item';
-    div.id = 'qi-' + qi;
-
-    let contextHtml = q.context ? `<div style="background:var(--pale);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.84rem;color:var(--accent2);"><em>${q.context}</em></div>` : '';
-
-    div.innerHTML = `
-      <div class="quiz-q">${contextHtml}${qi+1}. ${q.q}</div>
-      <div class="quiz-options">
-        ${q.options.map((opt, oi) => `<button class="opt-btn" onclick="answer(${qi},${oi})">${opt}</button>`).join('')}
-      </div>
-      <div class="quiz-feedback" id="qf-${qi}"></div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function answer(qi, oi) {
-  if (answered[qi]) return;
-  answered[qi] = true;
-
-  const item = document.getElementById('qi-' + qi);
-  const btns = item.querySelectorAll('.opt-btn');
-  const fb = document.getElementById('qf-' + qi);
-  const correct = quizData[qi].correct;
-
-  btns.forEach((b, i) => {
-    b.disabled = true;
-    if (i === correct) b.classList.add('correct');
-    else if (i === oi) b.classList.add('wrong');
-  });
-
-  fb.classList.add('show');
-  if (oi === correct) {
-    score++;
-    fb.classList.add('ok');
-    fb.innerHTML = '✓ Correct! ' + quizData[qi].explain;
-  } else {
-    fb.classList.add('bad');
-    fb.innerHTML = '✗ Not quite. ' + quizData[qi].explain;
-  }
-
-  if (answered.every(Boolean)) {
-    setTimeout(() => {
-      const scoreEl = document.getElementById('quiz-score');
-      document.getElementById('score-num').textContent = score + '/' + quizData.length;
-      scoreEl.querySelector('.score-label').textContent = score === quizData.length
-        ? '🎉 Perfect score! You really know your bahasa gaul!'
-        : score >= 4 ? '👍 Good work! Review the ones you missed.' : '📖 Keep studying — review the Vocabulary and Expressions tabs!';
-      scoreEl.classList.add('show');
-      scoreEl.scrollIntoView({ behavior: 'smooth' });
-    }, 400);
-  }
-}
-
-function resetQuiz() {
-  buildQuiz();
-  window.scrollTo({ top: document.getElementById('quiz').offsetTop - 60, behavior: 'smooth' });
-}
-
-// Fill-in check
-function checkFills() {
-  const inputs = document.querySelectorAll('.fill-input');
-  let correct = 0;
-  inputs.forEach(inp => {
-    const userVal = inp.value.trim().toLowerCase();
-    const ans = inp.dataset.ans.toLowerCase();
-    inp.classList.remove('correct-fill', 'wrong-fill');
-    if (userVal === ans) { inp.classList.add('correct-fill'); correct++; }
-    else if (userVal) { inp.classList.add('wrong-fill'); }
-  });
-  const result = document.getElementById('fill-result');
-  result.style.display = 'block';
-  result.style.padding = '10px 12px';
-  result.style.borderRadius = '8px';
-  if (correct === inputs.length) {
-    result.style.background = 'rgba(129,178,154,0.18)';
-    result.style.color = '#2d6a4f';
-    result.innerHTML = `✓ Perfect! All ${correct} correct.`;
-  } else {
-    result.style.background = 'rgba(224,122,95,0.12)';
-    result.style.color = '#7a3124';
-    result.innerHTML = `${correct}/${inputs.length} correct. Highlighted in red = wrong. Check the Vocabulary tab and try again!`;
-  }
-}
-
-// Init
-buildQuiz();
 </script>
 </body>
 </html>
